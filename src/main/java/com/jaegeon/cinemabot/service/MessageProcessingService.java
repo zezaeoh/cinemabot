@@ -28,6 +28,11 @@ public class MessageProcessingService {
         LinkedList<String> splitedMsg = new LinkedList<>();
         QueryInfo qi = new QueryInfo(); // 밑으로 내려가면서 조건을 체크하면서 점차 이 인스턴스를 채울 것
 
+        if(msg == null || msg.isEmpty()) {
+            printLog("null message inserted");
+            return null;
+        }
+
         // command split
         Collections.addAll(splitedMsg, msg.split("\\s+"));
         printLog(splitedMsg.toString());
