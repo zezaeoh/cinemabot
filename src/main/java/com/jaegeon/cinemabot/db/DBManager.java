@@ -4,7 +4,6 @@ import com.jaegeon.cinemabot.info.BranchInfo;
 import com.jaegeon.cinemabot.info.BranchInfoRoot;
 import com.jaegeon.cinemabot.info.QueryInfo;
 import com.jaegeon.cinemabot.info.SettingInfo;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
 import java.util.LinkedHashMap;
@@ -17,7 +16,7 @@ public class DBManager {
     private final String USER_NAME;
     private final String PASSWORD;
 
-    private static Connection conn = null;
+    private Connection conn = null;
 
     private Statement state = null;
 
@@ -28,9 +27,20 @@ public class DBManager {
         PASSWORD = SettingInfo.getPassword();
         try {
             Class.forName(JDBC_DRIVER);
-            if(conn == null)
-                conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
+            conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
             state = conn.createStatement();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void connectionValiedTest(){
+        try {
+            if(!conn.isValid(3600)) {
+                Class.forName(JDBC_DRIVER);
+                conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
+                state = conn.createStatement();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,6 +50,8 @@ public class DBManager {
         String sql;
         BranchInfoRoot root;
         ResultSet rs;
+
+        connectionValiedTest();
 
         sql = String.format("select br_name, br_id from th_branch where th_id = %s", s[0]);
         root = new BranchInfoRoot(s[1]);
@@ -116,12 +128,13 @@ public class DBManager {
         return null;
     }
 
-    @Nullable
     private ResultSet getTimeTable(QueryInfo qi) {
         List<BranchInfo> li;
         ResultSet rs = null;
         String sql;
         StringBuffer sb;
+
+        connectionValiedTest();
 
         try {
             if(qi.haveMvTime()) {
