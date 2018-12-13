@@ -34,6 +34,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('com.googlecode.json-simple:json-simple:1.1')
     implementation("mysql:mysql-connector-java:8.0.13")
+    implementation files('libs/kobis-opcl-rest-v1.0.jar')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 

@@ -7,10 +7,7 @@ import com.jaegeon.cinemabot.info.QueryInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class MessageProcessingService {
@@ -19,12 +16,11 @@ public class MessageProcessingService {
 
     public static String processMssage(String msg) {
         printLog("processMgs()");
-        final String command1 = "상영시간표";
         String thName = null;
         String time = null;
         BranchInfo bi = null;
         List<BranchInfo> biList = new LinkedList<>();
-        LinkedList<String> screeningScheduleLeaf = cd.getCm().get(command1);
+        HashMap<String, LinkedList<String>> commandSet = cd.getCm();
         LinkedList<String> splitedMsg = new LinkedList<>();
         QueryInfo qi = new QueryInfo(); // 밑으로 내려가면서 조건을 체크하면서 점차 이 인스턴스를 채울 것
 
@@ -38,14 +34,15 @@ public class MessageProcessingService {
         printLog(splitedMsg.toString());
         // command check
         outerloop:
-        for (String sMsg : splitedMsg)
-            for (String ssleaf : screeningScheduleLeaf)
-                if (sMsg.equals(ssleaf)) {
-                    printLog("Command is matched: " + sMsg + "=" + ssleaf);
-                    splitedMsg.remove(sMsg);
-                    qi.setCommand(command1); // 명령어가 매치되었으므로 qi에 입력
-                    break outerloop;
-                }
+        for(String command: commandSet.keySet())
+            for (String sMsg : splitedMsg)
+                for (String ssleaf : commandSet.get(command))
+                    if (sMsg.equals(ssleaf)) {
+                        printLog("Command is matched: " + sMsg + "=" + ssleaf);
+                        splitedMsg.remove(sMsg);
+                        qi.setCommand(command); // 명령어가 매치되었으므로 qi에 입력
+                        break outerloop;
+                    }
         if (!qi.haveCommand()) // 위 loop를 지나서도 명령어를 매치하지 못했으면 false를 리턴
             return null;
         printLog("Command is checked.." + splitedMsg.toString());

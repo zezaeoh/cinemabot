@@ -4,20 +4,25 @@ import com.jaegeon.cinemabot.info.BranchInfo;
 import com.jaegeon.cinemabot.info.BranchInfoRoot;
 import com.jaegeon.cinemabot.info.QueryInfo;
 import com.jaegeon.cinemabot.info.SettingInfo;
+import kr.or.kobis.kobisopenapi.consumer.rest.KobisOpenAPIRestService;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.sql.*;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
 
 public class DBManager {
     private final String JDBC_DRIVER;
     private final String DB_URL;
     private final String USER_NAME;
     private final String PASSWORD;
+    private final String APIKEY;
+
+    private final KobisOpenAPIRestService service;
 
     private Connection conn = null;
-
     private Statement state = null;
 
     public DBManager() {
@@ -25,6 +30,9 @@ public class DBManager {
         DB_URL = SettingInfo.getDbUrl();
         USER_NAME = SettingInfo.getUserName();
         PASSWORD = SettingInfo.getPassword();
+        APIKEY = SettingInfo.getApiKey();
+
+        service = new KobisOpenAPIRestService(APIKEY);
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
@@ -73,7 +81,8 @@ public class DBManager {
         LinkedList<String> reMsgs;
         StringBuffer sb;
         LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, LinkedList<String>>>> dict;
-        String th_name, br_name, mv_title, mv_time;
+        String th_name, br_name, mv_title, mv_time, tmp;
+        JSONParser parser;
 
         try {
             if (qi.getCommand().equals("상영시간표")) {
@@ -119,6 +128,34 @@ public class DBManager {
 
                 if(reMsgs.isEmpty())
                     return null;
+                return reMsgs;
+            } else if(qi.getCommand().equals("박스오피스")){
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.add(Calendar.DATE, -1);
+
+                tmp = service.getDailyBoxOffice(true,
+                        new SimpleDateFormat("yyyyMMdd").format(cal.getTime()),
+                        null,
+                        null,
+                        null,
+                        null);
+
+                parser = new JSONParser();
+                JSONObject obj = (JSONObject) parser.parse(tmp);
+
+                reMsgs = new LinkedList<>();
+
+                for(HashMap<String, String> movie :
+                        (List<HashMap<String,String>>)
+                                ((HashMap<String, HashMap>) obj.get("boxOfficeResult"))
+                                        .get("dailyBoxOfficeList")){
+                    reMsgs.add(movie.get("rank") + " " +
+                            movie.get("movieNm") +
+                            " 누적관객수 " +
+                            movie.get("audiAcc") + "명");
+                }
+
                 return reMsgs;
             }
         } catch (Exception e) {
