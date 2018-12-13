@@ -24,7 +24,7 @@ public class WebRestController {
         return jobj.toJSONString();
     }
 
-    @CrossOrigin(origins = "http://54.180.123.229")
+    @CrossOrigin
     @PostMapping(value = "/message", headers = "Accept=application/json")
     public String message(@RequestBody JSONObject resObj){
         String msg;
