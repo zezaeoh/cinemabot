@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class WebRestController {
 
+    @CrossOrigin
     @GetMapping("/hello")
     public String hello() {
         return "HelloWorld";
     }
 
+    @CrossOrigin
     @GetMapping("/keyboard")
     public String keyboard(){
 
@@ -22,6 +24,7 @@ public class WebRestController {
         return jobj.toJSONString();
     }
 
+    @CrossOrigin(origins = "http://54.180.123.229")
     @PostMapping(value = "/message", headers = "Accept=application/json")
     public String message(@RequestBody JSONObject resObj){
         String msg;
