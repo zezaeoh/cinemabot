@@ -90,7 +90,7 @@ public class MessageProcessingService {
 
         printLog(biList);
         printLog("QueryInfo: " + qi.getCommand() + " " + Integer.toString(qi.getThId()) + " " + qi.getThBrIds() + " "
-                + qi.getMvTime());
+                + qi.getMvTime() + "\n");
 
         /*
          * 조건 매칭을 계속 해나가면서 위의 과정을 반복 조건들: (영화관 이름 & 지점 이름) 또는 (지역 이름 & 영화 시간대)

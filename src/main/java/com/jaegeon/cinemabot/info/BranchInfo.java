@@ -22,4 +22,9 @@ public class BranchInfo {
 	public int getThId() {
 		return thId;
 	}
+
+	@Override
+	public String toString() {
+		return "(" + brName + ", " + brId + ", " + thId + ")";
+	}
 }

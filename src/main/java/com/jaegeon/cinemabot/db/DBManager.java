@@ -24,6 +24,8 @@ public class DBManager {
 
     private Connection conn = null;
     private Statement state = null;
+    private List<HashMap<String,String>> boxOffice = null;
+    private String apiDate = null;
 
     public DBManager() {
         JDBC_DRIVER = SettingInfo.getJdbcDriver();
@@ -81,8 +83,7 @@ public class DBManager {
         LinkedList<String> reMsgs;
         StringBuffer sb;
         LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, LinkedList<String>>>> dict;
-        String th_name, br_name, mv_title, mv_time, tmp;
-        JSONParser parser;
+        String th_name, br_name, mv_title, mv_time;
 
         try {
             if (qi.getCommand().equals("상영시간표")) {
@@ -133,23 +134,25 @@ public class DBManager {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
                 cal.add(Calendar.DATE, -1);
+                String curDate = new SimpleDateFormat("yyyyMMdd").format(cal.getTime());
 
-                tmp = service.getDailyBoxOffice(true,
-                        new SimpleDateFormat("yyyyMMdd").format(cal.getTime()),
-                        null,
-                        null,
-                        null,
-                        null);
-
-                parser = new JSONParser();
-                JSONObject obj = (JSONObject) parser.parse(tmp);
+                if(apiDate == null || !apiDate.equals(curDate)) {
+                    apiDate = curDate;
+                    String response = service.getDailyBoxOffice(true,
+                            apiDate,
+                            null,
+                            null,
+                            null,
+                            null);
+                    JSONParser parser = new JSONParser();
+                    JSONObject obj = (JSONObject) parser.parse(response);
+                    boxOffice = (List<HashMap<String,String>>)
+                            ((HashMap<String, HashMap>) obj.get("boxOfficeResult"))
+                                    .get("dailyBoxOfficeList");
+                }
 
                 reMsgs = new LinkedList<>();
-
-                for(HashMap<String, String> movie :
-                        (List<HashMap<String,String>>)
-                                ((HashMap<String, HashMap>) obj.get("boxOfficeResult"))
-                                        .get("dailyBoxOfficeList")){
+                for(HashMap<String, String> movie : boxOffice){
                     reMsgs.add(movie.get("rank") + " " +
                             movie.get("movieNm") +
                             " 누적관객수 " +
