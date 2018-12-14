@@ -113,7 +113,7 @@ public class MessageProcessingService {
         // 결과로 받은 String들을 client에게 전송
         StringBuffer sb = new StringBuffer();
         for (String ss : qr)
-            sb.append(ss).append("\n");
+            sb.append(ss).append("<br>");
         return sb.toString();
     }
 
