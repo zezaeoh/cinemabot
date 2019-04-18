@@ -25,21 +25,15 @@ public class QueryInfo {
 	}
 
 	public boolean haveCommand() {
-		if(command == null || command.isEmpty())
-			return false;
-		return true;
+		return command != null && !command.isEmpty();
 	}
 	
 	public boolean haveThId() {
-		if(thId == -1)
-			return false;
-		return true;
+		return thId != -1;
 	}
 	
 	public boolean haveThBrId() {
-		if(thBrIds == null || thBrIds.isEmpty())
-			return false;
-		return true;
+		return thBrIds != null && !thBrIds.isEmpty();
 	}
 	
 	public boolean haveMvTime() {

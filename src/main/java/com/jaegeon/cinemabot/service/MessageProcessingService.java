@@ -14,7 +14,7 @@ public class MessageProcessingService {
     private static DBManager dm = new DBManager();
     private static CachedData cd = new CachedData(dm);
 
-    public static String processMssage(String msg) {
+    public static String processMssage(String msg, boolean is_kakao) {
         printLog("processMgs()");
         String thName = null;
         String time = null;
@@ -24,7 +24,7 @@ public class MessageProcessingService {
         LinkedList<String> splitedMsg = new LinkedList<>();
         QueryInfo qi = new QueryInfo(); // 밑으로 내려가면서 조건을 체크하면서 점차 이 인스턴스를 채울 것
 
-        if(msg == null || msg.isEmpty()) {
+        if (msg == null || msg.isEmpty()) {
             printLog("null message inserted");
             return null;
         }
@@ -34,7 +34,7 @@ public class MessageProcessingService {
         printLog(splitedMsg.toString());
         // command check
         outerloop:
-        for(String command: commandSet.keySet())
+        for (String command : commandSet.keySet())
             for (String sMsg : splitedMsg)
                 for (String ssleaf : commandSet.get(command))
                     if (sMsg.equals(ssleaf)) {
@@ -112,8 +112,13 @@ public class MessageProcessingService {
 
         // 결과로 받은 String들을 client에게 전송
         StringBuffer sb = new StringBuffer();
-        for (String ss : qr)
-            sb.append(ss).append("<br>");
+        if (is_kakao) {
+            for (String ss : qr)
+                sb.append(ss).append("\n");
+        } else {
+            for (String ss : qr)
+                sb.append(ss).append("<br>");
+        }
         return sb.toString();
     }
 
